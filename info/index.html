@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Réseau">
+<meta name="theme-color" content="#0D0F14">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<title>MAO Réseau</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout : une colonne mobile, onglets en bas ; chaque module a sa couleur, le code et les adresses en mono */
+:root{
+  --bg:#F4F5F8; --surface:#FFFFFF; --surface2:#EEF0F4; --line:#E1E4EA;
+  --fg:#12151B; --muted:#5B6372; --on-accent:#FFFFFF;
+  --m1:#6D28D9; --m2:#2563EB; --m3:#047857; --m4:#C2410C; --m5:#0E7490; --m6:#BE123C; --m7:#A16207;
+  --good:#047857; --bad:#BE123C; --good-soft:#DDF3EA; --bad-soft:#FBE4E8;
+  --display:"Sora","Segoe UI",system-ui,sans-serif;
+  --body:"Manrope","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D0F14; --surface:#161A22; --surface2:#1E232D; --line:#262C38;
+  --fg:#EEF1F6; --muted:#9AA3B2; --on-accent:#0D0F14;
+  --m1:#B39BFF; --m2:#6AA8FF; --m3:#34D399; --m4:#FB923C; --m5:#4FD1E6; --m6:#FF6B81; --m7:#FBBF24;
+  --good:#34D399; --bad:#FF6B81; --good-soft:#14332A; --bad-soft:#3A1C22; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0D0F14; --surface:#161A22; --surface2:#1E232D; --line:#262C38;
+  --fg:#EEF1F6; --muted:#9AA3B2; --on-accent:#0D0F14;
+  --m1:#B39BFF; --m2:#6AA8FF; --m3:#34D399; --m4:#FB923C; --m5:#4FD1E6; --m6:#FF6B81; --m7:#FBBF24;
+  --good:#34D399; --bad:#FF6B81; --good-soft:#14332A; --bad-soft:#3A1C22; color-scheme:dark;
+}
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px)}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--m2);outline-offset:2px}
+.app{max-width:520px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 120px;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-0.01em}
+h1{font-size:28px;line-height:1.15}
+h2{font-size:22px;line-height:1.2}
+h3{font-size:16px}
+p{margin:0}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.muted{color:var(--muted)}
+.mono,code{font-family:var(--mono);font-variant-numeric:tabular-nums}
+code{background:var(--surface2);border-radius:6px;padding:1px 6px;font-size:.92em}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.stack{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;align-items:center;gap:10px}
+.between{justify-content:space-between}
+.wrap{flex-wrap:wrap}
+.btn{min-height:48px;border-radius:14px;border:none;padding:0 18px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--fg);color:var(--bg)}
+.btn-ghost{background:transparent;border:1px solid var(--line);color:var(--fg)}
+.btn-c{background:var(--c);color:var(--on-accent)}
+.btn-full{width:100%}
+.iconbtn{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--c,var(--m2))}
+
+/* Héros */
+.hero{background:var(--c);color:var(--on-accent);border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:10px}
+.hero .eyebrow{color:inherit;opacity:.85}
+.hero .btn{background:var(--on-accent);color:var(--c);align-self:flex-start}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.stat b{font-family:var(--mono);font-size:22px}
+.stat span{font-size:12px;color:var(--muted)}
+
+/* Modules */
+.mod{border-left:0}
+.mod .head{display:flex;align-items:center;gap:12px}
+.mod .badge{width:40px;height:40px;border-radius:12px;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;flex:0 0 auto}
+.lesson{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--surface2);border:none;border-radius:14px;padding:10px 12px;min-height:52px}
+.lesson .st{width:26px;height:26px;border-radius:99px;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;flex:0 0 auto;color:var(--on-accent)}
+.lesson.done .st{background:var(--c);border-color:var(--c)}
+.lesson .t{flex:1;min-width:0}
+.lesson small{display:block;color:var(--muted);font-size:12px}
+
+/* Leçon */
+.dots{display:flex;gap:4px}
+.dots i{flex:1;height:5px;border-radius:99px;background:var(--line)}
+.dots i.on{background:var(--c)}
+.slide{min-height:300px;justify-content:flex-start}
+.slide p{font-size:17px;line-height:1.55}
+.ex{background:var(--surface2);border-radius:14px;padding:12px 14px;font-family:var(--mono);font-size:14px;line-height:1.6;white-space:pre-wrap;overflow-x:auto;overflow-wrap:anywhere}
+.tip{border-radius:14px;padding:12px 14px;background:color-mix(in srgb,var(--c) 12%,transparent);font-size:15px}
+.tip b{color:var(--c)}
+.nav2{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px}
+
+/* Quiz */
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{text-align:left;min-height:52px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);padding:10px 14px;font-weight:600;display:flex;align-items:center;gap:10px}
+.opt .k{width:26px;height:26px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;flex:0 0 auto}
+.opt.good{border-color:var(--good);background:var(--good-soft)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.opt[disabled]{cursor:default}
+.fb{border-radius:14px;padding:12px 14px;font-size:15px}
+.fb.good{background:var(--good-soft)}
+.fb.bad{background:var(--bad-soft)}
+.fb b{display:block;margin-bottom:2px}
+
+/* Lexique */
+.search{min-height:48px;border-radius:14px;border:1px solid var(--line);background:var(--surface);padding:0 14px;width:100%}
+.term{border-top:1px solid var(--line);padding:10px 0;display:flex;flex-direction:column;gap:2px}
+.term:first-child{border-top:none}
+.term b{font-family:var(--mono)}
+
+/* Outil IP */
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-size:12px;color:var(--muted);font-weight:700}
+.field input{min-height:48px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);padding:0 12px;width:100%;min-width:0;font-family:var(--mono)}
+.res{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:6px 14px;font-size:14px}
+.res span{color:var(--muted)}
+.res b{font-family:var(--mono);font-weight:700;overflow-wrap:anywhere}
+.bits{font-family:var(--mono);font-size:12px;overflow-x:auto;white-space:nowrap;background:var(--surface2);border-radius:12px;padding:10px 12px}
+.bits .n{color:var(--m2);font-weight:700}
+.verdict{border-radius:14px;padding:12px 14px;font-weight:700}
+
+/* Onglets + toast */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:8px max(8px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));z-index:15}
+nav.tabs .in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px}
+nav.tabs button{background:none;border:none;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;font-weight:600;color:var(--muted);border-radius:12px}
+nav.tabs button[aria-current="page"]{color:var(--fg)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(14px + env(safe-area-inset-top,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;z-index:30;font-size:14px;max-width:calc(100% - 32px)}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<div id="toast" class="toast" role="status" hidden></div>
+<nav class="tabs" aria-label="Sections"><div class="in" id="tabs"></div></nav>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- Contenu des cours ---------- */
+/* Chaque leçon : des cartes courtes (t = titre, p = texte, ex = exemple, tip = astuce), puis 3 questions. */
+const MODS=[
+{id:'m1',nom:'Les bases',c:'--m1',lecons:[
+ {id:'bits',nom:'Bit, octet et binaire',min:4,cartes:[
+  {t:'0 ou 1',p:'Un ordinateur ne comprend que deux états : courant ou pas courant, donc 1 ou 0. Chaque 0 ou 1 s’appelle un <b>bit</b>.'},
+  {t:'L’octet',p:'On regroupe les bits par 8. <b>8 bits = 1 octet</b> (en anglais, un byte). Un octet peut valoir de 0 à 255, soit 256 valeurs.'},
+  {t:'Lire du binaire',p:'Chaque position vaut le double de celle de droite. On additionne les positions où il y a un 1.',ex:'128 64 32 16  8  4  2  1\n  1  1  0  0  0  0  0  0\n= 128 + 64 = 192'},
+  {t:'Mo ou Mb ?',p:'Les tailles de fichiers sont en <b>octets</b> (Mo, Go). Les débits Internet sont en <b>bits</b> par seconde (Mb/s). Pour passer de l’un à l’autre, divise par 8.',tip:'<b>Exemple :</b> une fibre à 800 Mb/s télécharge environ 100 Mo par seconde.'}],
+  quiz:[
+  {q:'Combien de bits dans un octet ?',o:['4','8','10','16'],r:1,e:'1 octet = 8 bits. C’est l’unité de base de toutes les tailles en informatique.'},
+  {q:'Que vaut 00001010 en décimal ?',o:['10','12','5','20'],r:0,e:'Il y a un 1 sur la position 8 et un sur la position 2 : 8 + 2 = 10.'},
+  {q:'Ta connexion fait 400 Mb/s. Combien de Mo par seconde environ ?',o:['400 Mo/s','50 Mo/s','4 Mo/s','3 200 Mo/s'],r:1,e:'400 ÷ 8 = 50. Mb/s = mégabits, Mo = mégaoctets.'}]},
+ {id:'client',nom:'Client et serveur',min:3,cartes:[
+  {t:'Qui demande, qui répond',p:'Sur un réseau, le <b>client</b> demande quelque chose et le <b>serveur</b> répond. Ton navigateur est un client. Le site web est sur un serveur.'},
+  {t:'Un serveur, c’est quoi ?',p:'C’est juste un ordinateur (ou un programme) qui attend des demandes et y répond. Il est souvent allumé en permanence.'},
+  {t:'Ton exemple : MAO',p:'Quand MAO tourne, ton PC est le <b>serveur</b> (FastAPI) et ton navigateur est le <b>client</b>.',ex:'http://127.0.0.1:8000\n127.0.0.1 = « moi-même » (localhost)\n8000     = le port où MAO écoute',tip:'<b>À retenir :</b> 127.0.0.1 désigne toujours l’appareil sur lequel tu es.'}],
+  quiz:[
+  {q:'Quand tu ouvres un site, ton navigateur est…',o:['le serveur','le client','le routeur','le DNS'],r:1,e:'Le navigateur envoie la demande : c’est le client. Le serveur renvoie la page.'},
+  {q:'Que désigne 127.0.0.1 ?',o:['La box internet','Google','L’appareil lui-même','Le serveur de l’école'],r:2,e:'127.0.0.1 (localhost) est l’adresse de boucle : elle pointe toujours vers ta propre machine.'},
+  {q:'Un serveur est…',o:['forcément un très gros ordinateur','un ordinateur ou programme qui répond aux demandes','un câble réseau','un site web'],r:1,e:'Ton PC peut être un serveur, comme avec MAO. Ce qui compte, c’est le rôle : répondre aux demandes.'}]}
+]},
+{id:'m2',nom:'Le réseau local',c:'--m2',lecons:[
+ {id:'ip',nom:'L’adresse IP',min:5,cartes:[
+  {t:'Une adresse pour chaque appareil',p:'Une <b>adresse IP</b> identifie un appareil sur un réseau, comme une adresse postale identifie une maison.'},
+  {t:'IPv4',p:'C’est 4 nombres de 0 à 255 séparés par des points. Chaque nombre est un octet, donc une IPv4 fait 32 bits.',ex:'192.168.1.20\n10.0.0.5'},
+  {t:'IP privée',p:'Chez toi ou au travail, les appareils ont des IP <b>privées</b>. Elles ne sont pas joignables directement depuis Internet.',ex:'10.0.0.0    → 10.255.255.255\n172.16.0.0  → 172.31.255.255\n192.168.0.0 → 192.168.255.255'},
+  {t:'IP publique',p:'Ta box a une IP <b>publique</b>, visible sur Internet. Tous les appareils de chez toi sortent sur Internet avec cette même adresse : c’est le <b>NAT</b>.'},
+  {t:'IPv6',p:'Il n’y a plus assez d’IPv4 pour tout le monde. L’IPv6 est beaucoup plus longue et s’écrit en hexadécimal.',ex:'2001:db8::1'}],
+  quiz:[
+  {q:'Laquelle est une adresse IPv4 valide ?',o:['192.168.1.300','192.168.1.30','192.168.1','192.168.1.30.4'],r:1,e:'4 nombres, chacun entre 0 et 255. 300 est trop grand.'},
+  {q:'Laquelle est une IP privée ?',o:['8.8.8.8','10.0.0.5','142.250.74.14','1.1.1.1'],r:1,e:'Les plages privées sont 10.x.x.x, 172.16 à 172.31.x.x et 192.168.x.x.'},
+  {q:'Pourquoi tous tes appareils ont la même IP sur Internet ?',o:['À cause du Wi‑Fi','Grâce au NAT de la box','À cause du DNS','C’est une erreur'],r:1,e:'La box traduit les IP privées en sa seule IP publique : c’est le NAT.'}]},
+ {id:'masque',nom:'Le masque et le réseau',min:5,cartes:[
+  {t:'À quoi sert le masque',p:'Le <b>masque</b> indique quelle partie de l’IP désigne le <b>réseau</b> et quelle partie désigne l’<b>appareil</b>.'},
+  {t:'Le cas le plus courant : /24',p:'Avec 255.255.255.0, les 3 premiers nombres sont le réseau, le dernier est l’appareil. On l’écrit aussi <b>/24</b> (24 bits de réseau).',ex:'192.168.1.20  /24\n192.168.1.45  /24\n→ même réseau : 192.168.1.x'},
+  {t:'Combien d’appareils ?',p:'Un /24 contient 256 adresses. La première (.0) est l’adresse du réseau, la dernière (.255) sert au broadcast. Il reste <b>254 appareils</b>.'},
+  {t:'Réseaux différents',p:'Deux appareils dans des réseaux différents ne se parlent pas directement. Il faut un <b>routeur</b> entre les deux.'},
+  {t:'Sur le terrain en GTB',p:'Ton PC est en 192.168.1.10/24 et l’automate en 192.168.2.50/24 : tu ne le verras pas.',tip:'<b>Réflexe :</b> mets ton PC dans le même réseau que l’automate, par exemple 192.168.2.10/24, avec une IP libre.'}],
+  quiz:[
+  {q:'192.168.1.20/24 et 192.168.1.200/24 sont…',o:['dans le même réseau','dans des réseaux différents','impossibles','des IP publiques'],r:0,e:'Avec /24, seuls les 3 premiers nombres comptent pour le réseau : 192.168.1, identiques.'},
+  {q:'Combien d’appareils possibles dans un /24 ?',o:['256','255','254','24'],r:2,e:'256 adresses moins l’adresse réseau (.0) et le broadcast (.255) : 254.'},
+  {q:'255.255.255.0 correspond à…',o:['/8','/16','/24','/32'],r:2,e:'Trois octets à 255 = 3 × 8 = 24 bits de réseau.'}]},
+ {id:'dhcp',nom:'Passerelle, DHCP et IP fixe',min:4,cartes:[
+  {t:'La passerelle',p:'La <b>passerelle</b> (gateway) est l’adresse du routeur. C’est la porte de sortie vers les autres réseaux et Internet. Chez toi, c’est souvent la box.',ex:'Passerelle : 192.168.1.1'},
+  {t:'Le DHCP',p:'Le <b>DHCP</b> donne automatiquement à chaque appareil son IP, son masque, sa passerelle et son DNS. Chez toi, c’est la box qui fait ça.'},
+  {t:'L’IP fixe',p:'Une IP <b>fixe</b> (statique) est réglée à la main. On l’utilise pour les appareils qu’on doit toujours retrouver à la même adresse : serveurs, imprimantes, automates GTB.'},
+  {t:'Voir ta configuration',p:'Sur Windows, ouvre l’invite de commandes et tape :',ex:'ipconfig\nipconfig /all   (avec la MAC et les DNS)'}],
+  quiz:[
+  {q:'Qui donne les IP automatiquement ?',o:['Le DNS','Le DHCP','Le switch','Le pare-feu'],r:1,e:'Le DHCP distribue IP, masque, passerelle et DNS.'},
+  {q:'Pourquoi un automate GTB a une IP fixe ?',o:['C’est plus rapide','Pour qu’on le retrouve toujours à la même adresse','Pour avoir Internet','Pour économiser de l’énergie'],r:1,e:'La supervision doit toujours trouver l’automate au même endroit. Si son IP changeait, la liaison casserait.'},
+  {q:'La passerelle, c’est…',o:['le routeur, la sortie vers les autres réseaux','le câble Ethernet','le nom du Wi‑Fi','l’adresse MAC'],r:0,e:'Sans passerelle, un appareil ne peut parler qu’à son propre réseau.'}]},
+ {id:'ports',nom:'Adresse MAC, ports, TCP et UDP',min:5,cartes:[
+  {t:'L’adresse MAC',p:'C’est l’identifiant de la carte réseau, gravé en usine. 6 octets en hexadécimal. Elle sert à l’intérieur du réseau local.',ex:'3C:52:82:1A:9F:04',tip:'<b>IP</b> = où est l’appareil sur le réseau. <b>MAC</b> = quelle carte précise.'},
+  {t:'Les ports',p:'Une IP désigne un appareil. Le <b>port</b> désigne le programme qui reçoit les données sur cet appareil. Il va de 0 à 65 535.',ex:'127.0.0.1:8000\n  adresse : port'},
+  {t:'Les ports à connaître',p:'Certains ports sont réservés à des services connus.',ex:'80     HTTP\n443    HTTPS\n22     SSH\n53     DNS\n502    Modbus TCP\n47808  BACnet/IP'},
+  {t:'TCP ou UDP',p:'<b>TCP</b> vérifie que tout arrive, dans l’ordre (web, e-mails). <b>UDP</b> envoie sans vérifier, c’est plus rapide (vidéo, jeux, DNS, BACnet/IP).'}],
+  quiz:[
+  {q:'Quel port utilise HTTPS ?',o:['80','22','443','502'],r:2,e:'443 pour HTTPS, 80 pour HTTP.'},
+  {q:'L’adresse MAC identifie…',o:['un site web','la carte réseau d’un appareil','un réseau entier','un port'],r:1,e:'La MAC est propre à chaque carte réseau.'},
+  {q:'Dans 127.0.0.1:11434, que représente 11434 ?',o:['L’adresse IP','Le masque','Le port','La MAC'],r:2,e:'Après les deux-points, c’est le port. 11434 est celui d’Ollama, le moteur de MAO.'}]}
+]},
+{id:'m3',nom:'Internet et le web',c:'--m3',lecons:[
+ {id:'dns',nom:'Le DNS',min:4,cartes:[
+  {t:'L’annuaire d’Internet',p:'Les humains retiennent des noms, les machines des IP. Le <b>DNS</b> traduit un nom en adresse IP.',ex:'github.com  →  140.82.121.4'},
+  {t:'Qui répond ?',p:'Ton appareil demande à un serveur DNS : celui de la box, de l’opérateur, ou un public comme 1.1.1.1 (Cloudflare) ou 8.8.8.8 (Google).'},
+  {t:'Quand le DNS tombe',p:'Le réseau marche, mais plus aucun site ne s’ouvre. Pour le vérifier :',ex:'ping 8.8.8.8     → répond\nping google.com  → échoue\n= problème de DNS',tip:'<b>Astuce :</b> l’IP de github.com peut changer. C’est justement pour ça qu’on utilise des noms.'}],
+  quiz:[
+  {q:'Le DNS sert à…',o:['chiffrer les données','traduire un nom en adresse IP','donner une IP à ton PC','bloquer les virus'],r:1,e:'C’est l’annuaire : un nom de domaine devient une adresse IP.'},
+  {q:'ping 8.8.8.8 marche mais pas ping google.com. Le problème vient…',o:['du câble','du DNS','de l’écran','du DHCP'],r:1,e:'La connexion fonctionne (l’IP répond), mais le nom n’est pas traduit : c’est le DNS.'},
+  {q:'1.1.1.1 est…',o:['une IP privée','un serveur DNS public','une adresse MAC','un masque'],r:1,e:'1.1.1.1 est le DNS public de Cloudflare.'}]},
+ {id:'http',nom:'URL et HTTP',min:4,cartes:[
+  {t:'Lire une URL',p:'Une URL se découpe en morceaux.',ex:'https://maelbodin.github.io/mao/index.html\n└─┬─┘   └───────┬────────┘└──────┬─────┘\nprotocole  nom de domaine      chemin'},
+  {t:'HTTP',p:'C’est la langue entre le navigateur et le serveur. Les deux demandes les plus courantes : <b>GET</b> pour lire une page, <b>POST</b> pour envoyer des données (un formulaire).'},
+  {t:'Les codes de réponse',p:'Le serveur répond toujours avec un code.',ex:'200  OK, tout va bien\n301  la page a déménagé\n403  accès interdit\n404  page introuvable\n500  erreur du serveur',tip:'<b>Tu l’as vu :</b> au début, ton app GitHub affichait 404 tant qu’elle n’était pas en ligne.'}],
+  quiz:[
+  {q:'Que veut dire une erreur 404 ?',o:['Serveur en panne','Page introuvable','Accès interdit','Tout va bien'],r:1,e:'404 = la page demandée n’existe pas à cette adresse.'},
+  {q:'Dans https://github.com/login, « github.com » est…',o:['le protocole','le nom de domaine','le chemin','le port'],r:1,e:'https = protocole, github.com = domaine, /login = chemin.'},
+  {q:'Pour envoyer un formulaire, on utilise souvent…',o:['GET','POST','404','DNS'],r:1,e:'POST envoie des données au serveur. GET sert à lire.'}]},
+ {id:'https',nom:'HTTPS et le cadenas',min:4,cartes:[
+  {t:'HTTP envoie en clair',p:'Avec HTTP simple, quelqu’un sur le même Wi‑Fi public peut lire ce que tu envoies : mots de passe, messages…'},
+  {t:'HTTPS chiffre',p:'<b>HTTPS = HTTP + TLS</b>. Les données sont chiffrées : elles deviennent illisibles pour tous, sauf toi et le serveur. Port 443.'},
+  {t:'Le certificat',p:'Le site présente un <b>certificat</b>, signé par une autorité de confiance. Il prouve que tu parles bien au vrai github.com, et pas à un imposteur.'},
+  {t:'Attention au cadenas',p:'Le cadenas veut dire « connexion chiffrée », <b>pas</b> « site honnête ». Un faux site peut avoir HTTPS.',tip:'<b>Réflexe :</b> vérifie toujours le nom de domaine. equans.com et equans-securite.com, ce n’est pas pareil.'}],
+  quiz:[
+  {q:'HTTPS sert surtout à…',o:['aller plus vite','chiffrer les échanges','bloquer les pubs','donner une IP'],r:1,e:'HTTPS chiffre les données entre toi et le serveur grâce à TLS.'},
+  {q:'Un site avec cadenas est forcément honnête ?',o:['Oui','Non','Seulement en France','Seulement sur iPhone'],r:1,e:'Le cadenas garantit le chiffrement, pas l’honnêteté. Les sites de phishing ont souvent HTTPS.'},
+  {q:'À quoi sert le certificat ?',o:['Prouver l’identité du site','Accélérer la page','Stocker les mots de passe','Donner le port'],r:0,e:'Il prouve que le site est bien celui qu’il prétend être.'}]}
+]},
+{id:'m4',nom:'Le matériel réseau',c:'--m4',lecons:[
+ {id:'materiel',nom:'Switch, routeur, box et VLAN',min:5,cartes:[
+  {t:'Le switch',p:'Il relie par câble les appareils d’un <b>même réseau</b>. Il envoie chaque message à la bonne carte grâce à l’adresse MAC.'},
+  {t:'Le routeur',p:'Il relie des <b>réseaux différents</b> et choisit la route grâce aux adresses IP. Internet, c’est des milliers de routeurs reliés.'},
+  {t:'La box',p:'Ta box fait tout en un : modem, routeur, switch, Wi‑Fi, DHCP, et parfois DNS.'},
+  {t:'Câble ou Wi‑Fi',p:'Le câble <b>Ethernet</b> (prise RJ45) est plus stable et plus rapide. Pour les automates et les serveurs, on préfère toujours le câble.'},
+  {t:'Le VLAN',p:'Un <b>VLAN</b> découpe un switch en plusieurs réseaux séparés, comme s’il y avait plusieurs switchs.',tip:'<b>En GTB :</b> on met souvent les automates dans un VLAN à part, séparé du réseau des bureaux, pour la sécurité.'}],
+  quiz:[
+  {q:'Quel appareil relie deux réseaux différents ?',o:['Le switch','Le routeur','Le câble RJ45','La carte réseau'],r:1,e:'Le routeur fait passer les données d’un réseau à l’autre.'},
+  {q:'Le switch se base sur…',o:['les adresses MAC','les noms de domaine','les certificats','les ports HTTPS'],r:0,e:'Le switch travaille dans le réseau local et utilise les MAC.'},
+  {q:'Pourquoi un VLAN pour la GTB ?',o:['Pour avoir plus de Wi‑Fi','Pour séparer les automates du reste du réseau','Pour aller sur Internet','Pour changer les MAC'],r:1,e:'Séparer les réseaux limite les risques : un PC infecté au bureau n’atteint pas directement les automates.'}]}
+]},
+{id:'m5',nom:'Les commandes utiles',c:'--m5',lecons:[
+ {id:'cmd',nom:'ping, ipconfig, tracert…',min:5,cartes:[
+  {t:'ping',p:'Vérifie si un appareil répond, et en combien de temps (en millisecondes).',ex:'ping 192.168.1.1\nRéponse de 192.168.1.1 : temps=2 ms'},
+  {t:'ipconfig, tracert, nslookup',p:'Les commandes Windows à connaître :',ex:'ipconfig /all        ta config complète\ntracert google.com   les routeurs traversés\nnslookup google.com  l’IP donnée par le DNS\narp -a               IP et MAC vues sur ton réseau'},
+  {t:'La méthode de dépannage',p:'Quand « Internet ne marche pas », teste dans cet ordre. La première étape qui échoue te dit où est le problème.',ex:'1. ping 127.0.0.1    ta carte réseau\n2. ping 192.168.1.1  ta box / passerelle\n3. ping 8.8.8.8      la sortie Internet\n4. ping google.com   le DNS'},
+  {t:'Sur un chantier GTB',p:'Avant d’ouvrir le logiciel de programmation, fais un <b>ping</b> de l’automate. S’il ne répond pas, vérifie le câble, puis que ton PC est dans le même réseau.'}],
+  quiz:[
+  {q:'Quelle commande vérifie qu’un appareil répond ?',o:['ipconfig','ping','nslookup','arp'],r:1,e:'ping envoie un petit message et attend la réponse.'},
+  {q:'ping 192.168.1.1 échoue, mais ping 127.0.0.1 marche. Le problème est…',o:['ta carte réseau','entre toi et la box','le DNS','le site'],r:1,e:'Ta machine marche, mais tu n’atteins pas la passerelle : câble, Wi‑Fi ou mauvaise IP.'},
+  {q:'Pour voir ton adresse MAC sur Windows :',o:['ping','ipconfig /all','tracert','nslookup'],r:1,e:'ipconfig /all affiche aussi l’« adresse physique », c’est-à-dire la MAC.'}]}
+]},
+{id:'m6',nom:'La sécurité',c:'--m6',lecons:[
+ {id:'secu',nom:'Les bons réflexes',min:5,cartes:[
+  {t:'Les mots de passe',p:'Un bon mot de passe est <b>long</b> (une phrase), <b>unique</b> pour chaque site, et rangé dans un <b>gestionnaire de mots de passe</b>.'},
+  {t:'La double authentification',p:'Avec la <b>2FA</b>, il faut ton mot de passe <b>et</b> un code sur ton téléphone. Active-la au moins sur ta boîte mail et GitHub.'},
+  {t:'Le phishing',p:'Un faux message qui veut tes identifiants. Les signes : urgence, menace, lien bizarre, faute dans le nom du site.',tip:'<b>Réflexe :</b> ne clique pas. Va toi-même sur le site en tapant l’adresse.'},
+  {t:'Pare-feu et VPN',p:'Le <b>pare-feu</b> bloque les connexions non autorisées selon le port et l’IP. Le <b>VPN</b> crée un tunnel chiffré vers un autre réseau, comme Tailscale pour relier ton iPhone et ton PC.'},
+  {t:'Les mises à jour',p:'Elles corrigent des failles de sécurité connues. Un appareil jamais mis à jour est une porte ouverte, surtout un automate relié au réseau.'}],
+  quiz:[
+  {q:'Le meilleur mot de passe :',o:['Mael2006','Une longue phrase unique dans un gestionnaire','Le même partout mais compliqué','azerty123'],r:1,e:'Long et unique. Le gestionnaire le retient pour toi.'},
+  {q:'Un mail « ton compte sera bloqué dans 1 h, clique ici » :',o:['Je clique vite','C’est sûrement du phishing','Je réponds avec mon mot de passe','Je le transfère à tout le monde'],r:1,e:'L’urgence est le signe classique du phishing. Va directement sur le site toi-même.'},
+  {q:'Un VPN sert à…',o:['créer un tunnel chiffré vers un réseau','accélérer le Wi‑Fi','remplacer le DNS','changer ta MAC'],r:0,e:'Le VPN relie des appareils de façon chiffrée, même à distance.'}]}
+]},
+{id:'m7',nom:'Le réseau en GTB',c:'--m7',lecons:[
+ {id:'gtb',nom:'BACnet/IP et Modbus TCP',min:5,cartes:[
+  {t:'La GTB sur IP',p:'Aujourd’hui, beaucoup d’automates et de supervisions communiquent sur un réseau Ethernet classique, avec des adresses IP.'},
+  {t:'BACnet/IP',p:'Le protocole standard du bâtiment. Il passe en UDP sur le port <b>47808</b>. Chaque équipement a un <b>Device ID</b> unique et contient des <b>objets</b>.',ex:'Analog Input   AI  température\nAnalog Output  AO  vanne 0-100 %\nBinary Input   BI  défaut, contact\nBinary Output  BO  marche / arrêt'},
+  {t:'Modbus TCP',p:'Plus simple. Un client (le maître) lit et écrit des <b>registres</b> dans un serveur (l’esclave). Port <b>502</b>.'},
+  {t:'Les règles du terrain',p:'Ce qui évite 90 % des galères :',ex:'• IP fixe pour chaque automate\n• un plan d’adressage noté et à jour\n• Device ID BACnet unique\n• réseau GTB séparé (VLAN)\n• jamais d’automate direct sur Internet'},
+  {t:'Diagnostic rapide',p:'Un équipement ne remonte pas en supervision ? Ping l’automate, vérifie que tu es dans le même réseau, puis vérifie le port et le Device ID.'}],
+  quiz:[
+  {q:'Le port de BACnet/IP :',o:['502','443','47808','8000'],r:2,e:'47808 (0xBAC0 en hexadécimal, un clin d’œil à « BAC »).'},
+  {q:'Le port de Modbus TCP :',o:['502','80','22','47808'],r:0,e:'Modbus TCP utilise le port 502.'},
+  {q:'Deux automates BACnet ont le même Device ID. Que se passe-t-il ?',o:['Rien, c’est normal','Des conflits : la supervision les confond','Ils vont plus vite','Ils changent d’IP'],r:1,e:'Le Device ID doit être unique sur le réseau BACnet, sinon les équipements se mélangent.'}]}
+]}
+];
+const LEXIQUE=[
+['Bit','Un 0 ou un 1, la plus petite information.'],['Octet','8 bits. Vaut de 0 à 255.'],['Client','Programme ou appareil qui fait une demande.'],['Serveur','Programme ou appareil qui répond aux demandes.'],
+['localhost','127.0.0.1, l’appareil lui-même.'],['Adresse IP','Adresse d’un appareil sur un réseau. Ex. 192.168.1.20.'],['IP privée','IP utilisée dans un réseau local (10.x, 172.16-31.x, 192.168.x).'],['IP publique','IP visible sur Internet, celle de ta box.'],
+['NAT','Traduction des IP privées vers l’IP publique de la box.'],['IPv6','Nouvelle version des adresses IP, plus longue, en hexadécimal.'],['Masque','Indique la partie réseau d’une IP. Ex. 255.255.255.0 = /24.'],['CIDR','Notation du masque avec une barre : /24, /16…'],
+['Broadcast','Dernière adresse d’un réseau, pour parler à tous les appareils.'],['Passerelle','Adresse du routeur, sortie vers les autres réseaux.'],['DHCP','Service qui donne automatiquement IP, masque, passerelle et DNS.'],['IP fixe','IP réglée à la main, qui ne change pas.'],
+['Adresse MAC','Identifiant unique d’une carte réseau.'],['Port','Numéro du programme qui reçoit les données sur un appareil.'],['TCP','Transport fiable, vérifie que tout arrive dans l’ordre.'],['UDP','Transport rapide, sans vérification.'],
+['DNS','Annuaire qui traduit un nom de domaine en IP.'],['URL','Adresse complète d’une page : protocole, domaine, chemin.'],['HTTP','Langage entre navigateur et serveur web.'],['HTTPS','HTTP chiffré avec TLS. Port 443.'],
+['TLS','Le chiffrement utilisé par HTTPS.'],['Certificat','Preuve de l’identité d’un site, signée par une autorité.'],['Switch','Relie les appareils d’un même réseau, utilise les MAC.'],['Routeur','Relie des réseaux différents, utilise les IP.'],
+['VLAN','Réseau virtuel séparé sur un même switch.'],['RJ45','La prise du câble Ethernet.'],['ping','Commande qui teste si un appareil répond.'],['ipconfig','Commande Windows qui affiche la config réseau.'],
+['Pare-feu','Filtre qui bloque les connexions non autorisées.'],['VPN','Tunnel chiffré vers un autre réseau.'],['2FA','Double authentification : mot de passe + code.'],['Phishing','Faux message pour voler tes identifiants.'],
+['BACnet/IP','Protocole standard de la GTB, port UDP 47808.'],['Device ID','Identifiant unique d’un équipement BACnet.'],['Modbus TCP','Protocole industriel simple à registres, port 502.']
+];
+
+/* ---------- Icônes ---------- */
+const P={home:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
+ book:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/>',
+ tool:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4M7 9h2M11 9h2M15 9h2"/>',
+ quiz:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.01"/>',
+ check:'<path d="M5 12l5 5 9-10"/>',back:'<path d="M15 6l-6 6 6 6"/>',arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>'};
+function ic(n,s){s=s||22;return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+P[n]+'</svg>';}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+/* ---------- Progression (gardée dans le téléphone) ---------- */
+const LS='mao-reseau-v1';
+let PR={done:{},jours:[],scores:{}};
+try{const r=JSON.parse(localStorage.getItem(LS)||'null');if(r)PR=Object.assign(PR,r);}catch(e){}
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
+function save(){try{localStorage.setItem(LS,JSON.stringify(PR));}catch(e){}}
+function today(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function markDay(){const t=today();if(!PR.jours.includes(t)){PR.jours.push(t);save();}}
+function serie(){
+  const set=new Set(PR.jours);let n=0;const d=new Date();
+  if(!set.has(today()))d.setDate(d.getDate()-1);
+  while(true){const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');if(set.has(k)){n++;d.setDate(d.getDate()-1);}else break;}
+  return n;
+}
+const ALL=[];MODS.forEach(m=>m.lecons.forEach(l=>ALL.push({m,l})));
+function find(id){return ALL.find(x=>x.l.id===id);}
+function next(){return ALL.find(x=>!PR.done[x.l.id]);}
+
+/* ---------- État de l'écran ---------- */
+const U={tab:'accueil',lecon:null,step:0,quiz:null,q:''};
+
+/* ---------- Écrans ---------- */
+function vAccueil(){
+  const n=Object.keys(PR.done).length,tot=ALL.length,nx=next();
+  let h='<div class="stack" style="gap:4px"><span class="eyebrow">Réseau et informatique</span><h1>Apprends un peu chaque jour</h1></div>';
+  if(nx){
+    h+='<div class="hero" style="--c:var('+nx.m.c+')"><span class="eyebrow">'+(n?'Continuer':'Commencer')+' · '+esc(nx.m.nom)+'</span><h2>'+esc(nx.l.nom)+'</h2><span>'+nx.l.cartes.length+' cartes et 3 questions · environ '+nx.l.min+' min</span><button class="btn" data-a="open" data-v="'+nx.l.id+'">C’est parti '+ic('arrow',16)+'</button></div>';
+  }else{
+    h+='<div class="hero" style="--c:var(--m3)"><span class="eyebrow">Bravo</span><h2>Tu as fini toutes les leçons</h2><span>Garde tes acquis avec une révision de temps en temps.</span><button class="btn" data-a="revision">Lancer une révision '+ic('arrow',16)+'</button></div>';
+  }
+  h+='<div class="stats"><div class="stat"><b>'+n+'/'+tot+'</b><span>leçons</span></div><div class="stat"><b>'+serie()+'</b><span>jour'+(serie()>1?'s':'')+' de suite</span></div><div class="stat"><b>'+moyenne()+'</b><span>réussite</span></div></div>';
+  h+='<div class="bar" style="--c:var(--m2)"><i style="width:'+Math.round(n/tot*100)+'%"></i></div>';
+  h+=vModules();
+  return h;
+}
+function moyenne(){const v=Object.values(PR.scores);if(!v.length)return '—';return Math.round(v.reduce((a,b)=>a+b,0)/v.length*100/3)+' %';}
+function vModules(){
+  return MODS.map((m,mi)=>{
+    const d=m.lecons.filter(l=>PR.done[l.id]).length;
+    return '<div class="card mod" style="--c:var('+m.c+')"><div class="head"><span class="badge">'+(mi+1)+'</span><div class="stack" style="gap:0;flex:1;min-width:0"><h3>'+esc(m.nom)+'</h3><span class="muted" style="font-size:13px">'+d+' / '+m.lecons.length+' leçon'+(m.lecons.length>1?'s':'')+'</span></div></div>'
+      +'<div class="stack" style="gap:6px">'+m.lecons.map(l=>'<button class="lesson'+(PR.done[l.id]?' done':'')+'" data-a="open" data-v="'+l.id+'"><span class="st">'+(PR.done[l.id]?ic('check',14):'')+'</span><span class="t"><b>'+esc(l.nom)+'</b><small>'+(PR.done[l.id]?'Réussie '+PR.scores[l.id]+'/3 · revoir':'environ '+l.min+' min')+'</small></span>'+ic('arrow',16)+'</button>').join('')+'</div></div>';
+  }).join('');
+}
+function vCours(){return '<div class="stack" style="gap:4px"><span class="eyebrow">7 modules</span><h1>Les cours</h1></div>'+vModules();}
+
+function vLecon(){
+  const x=find(U.lecon),l=x.l,m=x.m,c=l.cartes,s=U.step;
+  if(U.quiz)return vQuiz(l.quiz,m.c,'Quiz · '+l.nom,()=>finLecon());
+  const k=c[s];
+  let h='<div class="row"><button class="iconbtn" aria-label="Retour" data-a="home">'+ic('back',20)+'</button><div class="stack" style="gap:0;min-width:0"><span class="eyebrow">'+esc(m.nom)+'</span><h3>'+esc(l.nom)+'</h3></div></div>';
+  h+='<div class="dots" style="--c:var('+m.c+')">'+c.map((_,i)=>'<i class="'+(i<=s?'on':'')+'"></i>').join('')+'<i></i></div>';
+  h+='<div class="card slide" style="--c:var('+m.c+')"><span class="eyebrow">Carte '+(s+1)+' sur '+c.length+'</span><h2>'+esc(k.t)+'</h2><p>'+k.p+'</p>'+(k.ex?'<div class="ex">'+esc(k.ex)+'</div>':'')+(k.tip?'<div class="tip">'+k.tip+'</div>':'')+'</div>';
+  h+='<div class="nav2" style="--c:var('+m.c+')">'+(s>0?'<button class="btn btn-ghost" data-a="prev" aria-label="Carte précédente">'+ic('back',18)+'</button>':'<span></span>')
+    +(s<c.length-1?'<button class="btn btn-c" data-a="next">Suivant '+ic('arrow',16)+'</button>':'<button class="btn btn-c" data-a="toquiz">Passer au quiz '+ic('arrow',16)+'</button>')+'</div>';
+  return h;
+}
+function vQuiz(qs,c,titre,onEnd){
+  const Q=U.quiz;
+  if(Q.i>=qs.length){return onEnd();}
+  const q=qs[Q.i],rep=Q.rep;
+  let h='<div class="row"><button class="iconbtn" aria-label="Quitter le quiz" data-a="home">'+ic('back',20)+'</button><div class="stack" style="gap:0;min-width:0"><span class="eyebrow">'+esc(titre)+'</span><h3>Question '+(Q.i+1)+' sur '+qs.length+'</h3></div></div>';
+  h+='<div class="dots" style="--c:var('+c+')">'+qs.map((_,i)=>'<i class="'+(i<Q.i||(i===Q.i&&rep!=null)?'on':'')+'"></i>').join('')+'</div>';
+  h+='<div class="card" style="--c:var('+c+')"><h2>'+esc(q.q)+'</h2><div class="opts">'+q.o.map((o,i)=>{
+    let cl='opt';if(rep!=null){if(i===q.r)cl+=' good';else if(i===rep)cl+=' bad';}
+    return '<button class="'+cl+'" data-a="rep" data-v="'+i+'"'+(rep!=null?' disabled':'')+'><span class="k">'+'ABCD'[i]+'</span><span>'+esc(o)+'</span></button>';
+  }).join('')+'</div>'
+  +(rep!=null?'<div class="fb '+(rep===q.r?'good':'bad')+'" role="status"><b>'+(rep===q.r?['Bien joué.','Exact.','Parfait.'][Q.i%3]:'Pas tout à fait.')+'</b>'+esc(q.e)+'</div><button class="btn btn-c btn-full" data-a="qnext">'+(Q.i<qs.length-1?'Question suivante':'Voir le résultat')+' '+ic('arrow',16)+'</button>':'')
+  +'</div>';
+  return h;
+}
+function finLecon(){
+  const x=find(U.lecon),sc=U.quiz.ok,tot=x.l.quiz.length,ok=sc>=2;
+  if(!U.quiz.saved){U.quiz.saved=true;markDay();if(ok){PR.done[x.l.id]=true;PR.scores[x.l.id]=Math.max(PR.scores[x.l.id]||0,sc);}save();}
+  const nx=next();
+  let h='<div class="card" style="--c:var('+x.m.c+');text-align:center;align-items:center;padding:28px 16px"><span class="eyebrow">'+esc(x.l.nom)+'</span><span class="mono" style="font-size:48px;font-weight:700;color:var(--c)">'+sc+'/'+tot+'</span><h2>'+(sc===tot?'Sans faute !':ok?'Leçon validée':'Presque, revois les cartes')+'</h2><p class="muted">'+(ok?'Tu peux passer à la suite.':'Il faut 2 bonnes réponses sur 3 pour valider.')+'</p></div>';
+  h+='<div class="stack" style="--c:var('+x.m.c+')">'+(ok&&nx?'<button class="btn btn-c btn-full" data-a="open" data-v="'+nx.l.id+'">Leçon suivante : '+esc(nx.l.nom)+'</button>':'')+(!ok?'<button class="btn btn-c btn-full" data-a="open" data-v="'+x.l.id+'">Revoir la leçon</button>':'')+'<button class="btn btn-ghost btn-full" data-a="home">Retour à l’accueil</button></div>';
+  return h;
+}
+function vRevision(){
+  if(U.quiz&&U.quiz.rev)return vQuiz(U.quiz.qs,'--m2','Révision',()=>finRev());
+  const pool=ALL.filter(x=>PR.done[x.l.id]);
+  let h='<div class="stack" style="gap:4px"><span class="eyebrow">Mémoriser</span><h1>Révision</h1></div>';
+  h+='<div class="card" style="--c:var(--m2)"><h3>10 questions au hasard</h3><p class="muted">Tirées des leçons que tu as déjà validées. Le meilleur moyen de ne pas oublier.</p>'+(pool.length?'<button class="btn btn-c btn-full" data-a="revision">Lancer la révision</button>':'<p>Valide d’abord une leçon, puis reviens ici.</p>')+'</div>';
+  h+='<div class="card"><h3>Lexique</h3><label for="lx" class="eyebrow">Chercher un mot</label><input id="lx" class="search" placeholder="DNS, masque, port…" value="'+esc(U.q)+'" autocomplete="off"><div id="lxl">'+lexHtml()+'</div></div>';
+  return h;
+}
+function lexHtml(){
+  const q=U.q.trim().toLowerCase();
+  const r=LEXIQUE.filter(([a,b])=>!q||a.toLowerCase().includes(q)||b.toLowerCase().includes(q)).sort((a,b)=>a[0].localeCompare(b[0],'fr'));
+  return r.length?r.map(([a,b])=>'<div class="term"><b>'+esc(a)+'</b><span class="muted">'+esc(b)+'</span></div>').join(''):'<p class="muted">Aucun mot trouvé.</p>';
+}
+function finRev(){
+  const Q=U.quiz;if(!Q.saved){Q.saved=true;markDay();save();}
+  return '<div class="card" style="text-align:center;align-items:center;padding:28px 16px"><span class="eyebrow">Révision</span><span class="mono" style="font-size:48px;font-weight:700;color:var(--m2)">'+Q.ok+'/'+Q.qs.length+'</span><h2>'+(Q.ok>=Q.qs.length*0.8?'Tu maîtrises':'Encore un petit effort')+'</h2></div><button class="btn btn-full" data-a="revision">Nouvelle révision</button><button class="btn btn-ghost btn-full" data-a="tab" data-v="revision">Retour</button>';
+}
+
+/* ---------- Calculateur IP ---------- */
+function ipToInt(s){const p=String(s).trim().split('.');if(p.length!==4)return null;let n=0;for(const x of p){if(!/^\d{1,3}$/.test(x))return null;const v=+x;if(v>255)return null;n=n*256+v;}return n>>>0;}
+function intToIp(n){return [24,16,8,0].map(b=>(n>>>b)&255).join('.');}
+function parseMask(s){s=String(s).trim().replace(/^\//,'');if(/^\d{1,2}$/.test(s)){const c=+s;return c<=32?c:null;}const n=ipToInt(s);if(n==null)return null;const b=n.toString(2).padStart(32,'0');if(!/^1*0*$/.test(b))return null;return b.indexOf('0')===-1?32:b.indexOf('0');}
+function maskInt(c){return c===0?0:(0xFFFFFFFF<<(32-c))>>>0;}
+function bin(n,c){const b=n.toString(2).padStart(32,'0');let o='';for(let i=0;i<32;i++){if(i&&i%8===0)o+='.';o+=(i<c?'<span class="n">'+b[i]+'</span>':b[i]);}return o;}
+const T={ip:'192.168.1.20',mask:'24',ip2:'192.168.1.45'};
+function vOutil(){
+  return '<div class="stack" style="gap:4px"><span class="eyebrow">Pratique</span><h1>Calculateur IP</h1></div>'
+  +'<div class="card"><div class="row wrap" style="align-items:flex-end"><div class="field" style="flex:2 1 180px"><label for="t-ip">Adresse IP</label><input id="t-ip" inputmode="decimal" value="'+esc(T.ip)+'" autocomplete="off"></div><div class="field" style="flex:1 1 110px"><label for="t-m">Masque ou /CIDR</label><input id="t-m" inputmode="decimal" value="'+esc(T.mask)+'" autocomplete="off"></div></div><div id="t-res">'+calc()+'</div></div>'
+  +'<div class="card"><h3>Même réseau ?</h3><p class="muted" style="font-size:14px">Mets l’IP de ton PC au-dessus, et celle de l’automate ici.</p><div class="field"><label for="t-ip2">Deuxième adresse IP</label><input id="t-ip2" inputmode="decimal" value="'+esc(T.ip2)+'" autocomplete="off"></div><div id="t-cmp">'+cmp()+'</div></div>';
+}
+function calc(){
+  const ip=ipToInt(T.ip),c=parseMask(T.mask);
+  if(ip==null)return '<p class="muted">Écris une IP du type 192.168.1.20.</p>';
+  if(c==null)return '<p class="muted">Écris un masque comme 255.255.255.0 ou /24.</p>';
+  const m=maskInt(c),net=(ip&m)>>>0,bc=(net|(~m>>>0))>>>0,size=2**(32-c);
+  const hosts=c>=31?(c===32?1:2):size-2;
+  const first=c>=31?net:net+1,last=c>=31?bc:bc-1;
+  return '<div class="res"><span>Masque</span><b>'+intToIp(m)+' (/'+c+')</b><span>Réseau</span><b>'+intToIp(net)+'</b><span>Broadcast</span><b>'+intToIp(bc)+'</b><span>Appareils</span><b>'+intToIp(first)+' → '+intToIp(last)+'</b><span>Nombre</span><b>'+hosts.toLocaleString('fr-FR')+'</b></div>'
+   +'<div class="eyebrow" style="margin-top:4px">En binaire (bleu = partie réseau)</div><div class="bits">'+bin(ip,c)+'</div>';
+}
+function cmp(){
+  const a=ipToInt(T.ip),b=ipToInt(T.ip2),c=parseMask(T.mask);
+  if(a==null||b==null||c==null)return '';
+  const m=maskInt(c),same=((a&m)>>>0)===((b&m)>>>0);
+  return '<div class="verdict" style="background:var('+(same?'--good-soft':'--bad-soft')+')">'+(same?'Oui, même réseau : ils peuvent se parler directement.':'Non, réseaux différents : il faut un routeur, ou changer l’IP de ton PC.')+'</div>';
+}
+
+/* ---------- Rendu ---------- */
+const TABS=[['accueil','Accueil','home'],['cours','Cours','book'],['revision','Réviser','quiz'],['outil','Outil IP','tool']];
+function render(){
+  let h;
+  if(U.lecon)h=vLecon();
+  else h={accueil:vAccueil,cours:vCours,revision:vRevision,outil:vOutil}[U.tab]();
+  document.getElementById('app').innerHTML=h;
+  document.getElementById('tabs').innerHTML=TABS.map(([id,l,i])=>'<button data-a="tab" data-v="'+id+'"'+(!U.lecon&&U.tab===id?' aria-current="page"':'')+'>'+ic(i,22)+l+'</button>').join('');
+}
+function top(){window.scrollTo(0,0);}
+let tt=null;function toast(m){const el=document.getElementById('toast');el.textContent=m;el.hidden=false;clearTimeout(tt);tt=setTimeout(()=>{el.hidden=true;},2200);}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+document.addEventListener('click',ev=>{
+  const b=ev.target.closest('[data-a]');if(!b)return;
+  const a=b.dataset.a,v=b.dataset.v;
+  if(a==='tab'){U.tab=v;U.lecon=null;U.quiz=null;render();top();}
+  else if(a==='home'){U.lecon=null;U.quiz=null;render();top();}
+  else if(a==='open'){U.lecon=v;U.step=0;U.quiz=null;render();top();}
+  else if(a==='next'){U.step++;render();top();}
+  else if(a==='prev'){U.step--;render();top();}
+  else if(a==='toquiz'){U.quiz={i:0,rep:null,ok:0};render();top();}
+  else if(a==='rep'){const Q=U.quiz;if(Q.rep!=null)return;const qs=Q.rev?Q.qs:find(U.lecon).l.quiz;Q.rep=+v;if(Q.rep===qs[Q.i].r)Q.ok++;render();}
+  else if(a==='qnext'){U.quiz.i++;U.quiz.rep=null;render();top();}
+  else if(a==='revision'){
+    const pool=[];ALL.filter(x=>PR.done[x.l.id]).forEach(x=>x.l.quiz.forEach(q=>pool.push(q)));
+    if(!pool.length){U.tab='revision';U.lecon=null;U.quiz=null;render();toast('Valide d’abord une leçon');return;}
+    U.tab='revision';U.lecon=null;U.quiz={rev:true,qs:shuffle(pool).slice(0,10),i:0,rep:null,ok:0};render();top();
+  }
+});
+document.addEventListener('input',ev=>{
+  const id=ev.target.id;
+  if(id==='lx'){U.q=ev.target.value;document.getElementById('lxl').innerHTML=lexHtml();}
+  if(id==='t-ip'||id==='t-m'||id==='t-ip2'){T.ip=document.getElementById('t-ip').value;T.mask=document.getElementById('t-m').value;T.ip2=document.getElementById('t-ip2').value;document.getElementById('t-res').innerHTML=calc();document.getElementById('t-cmp').innerHTML=cmp();}
+});
+
+render();
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+})();
+</script>
+</body>
+</html>
